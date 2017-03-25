@@ -15,4 +15,6 @@ public class Constants {
     public static final String BUCKET_NAME = System.getProperty("BUCKET_NAME");
     public static final String AWS_ACCESS_KEY = System.getProperty("AWS_ACCESS_KEY");
     public static final String AWS_SECRET_KEY = System.getProperty("AWS_SECRET_KEY");
+    public static final String HASH_KEY = "HASH";
+    public static final String LAST_MODIFIED_KEY = "LAST_MODIFIED";
 }

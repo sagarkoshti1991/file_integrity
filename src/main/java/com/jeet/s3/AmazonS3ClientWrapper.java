@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -88,8 +89,8 @@ public class AmazonS3ClientWrapper {
         try {
             ObjectMetadata objectMetadata = new ObjectMetadata();
             Map userMetadata = new HashMap();
-            userMetadata.put("HASH", hash);
-            userMetadata.put("LAST_MODIFIED", String.valueOf(new Date().getTime()));
+            userMetadata.put(Constants.HASH_KEY, hash);
+            userMetadata.put(Constants.LAST_MODIFIED_KEY, String.valueOf(new Date().getTime()));
             objectMetadata.setUserMetadata(userMetadata);
             PutObjectResult objectResult = s3Client
                     .putObject(
@@ -101,6 +102,26 @@ public class AmazonS3ClientWrapper {
             e.printStackTrace();
         }
         return isFileUploaded;
+    }
+
+    public Date getLastModified(String path) {
+        try {
+            ObjectMetadata objectMetadata = s3Client.getObjectMetadata(Constants.BUCKET_NAME, path);
+            return objectMetadata != null ? objectMetadata.getLastModified() : null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Map getUserMetadata(String path) {
+        try {
+            ObjectMetadata objectMetadata = s3Client.getObjectMetadata(Constants.BUCKET_NAME, path);
+            return objectMetadata != null ? objectMetadata.getUserMetadata() : null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.EMPTY_MAP;
+        }
     }
 
     public void renameImage(String originalpath, String newpath) {

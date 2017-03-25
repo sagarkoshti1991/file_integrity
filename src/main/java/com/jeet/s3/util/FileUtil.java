@@ -50,7 +50,7 @@ public class FileUtil {
             return S3Connect.uploadFile(Constants.ROOT_FOLDER
                     + "/" + file.getName(), new FileInputStream(encFile), hash);
         } catch (Exception ex) {
-//            Logger.getLogger(FileUtil.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
         return false;
     }

@@ -145,7 +145,24 @@ public class Admin {
                     File file = FileUtil.downloadAndDecryptFile(key);
                     if (FileUtil.getHash(key.split("/")[1])
                             .equals(HashUtil.generateFileHash(file))) {
-                        System.out.println(ANSI_RED + "Data integrity is preserved.");
+                        Map userMetadata = S3Connect.getUserMetadata(key);
+//                        System.out.println(userMetadata.get(Constants.LAST_MODIFIED_KEY));
+//                        System.out.println(S3Connect.getLastModified(key).getTime());
+                        //check last access time
+//                        if (userMetadata.containsKey(Constants.LAST_MODIFIED_KEY)
+//                                && userMetadata.get(Constants.LAST_MODIFIED_KEY)
+//                                        .equals(S3Connect.getLastModified(key).getTime())) {
+                        //check hash from user data
+                        if (userMetadata.containsKey(Constants.HASH_KEY)
+                                && userMetadata.get(Constants.HASH_KEY)
+                                        .equals(FileUtil.getHash(key.split("/")[1]))) {
+                            System.out.println(ANSI_GREEN + "Data integrity is preserved.");
+                        } else {
+                            System.out.println(ANSI_RED + "Data integrity is not preserved.");
+                        }
+//                        } else {
+//                            System.out.println(ANSI_RED + "File is modified outside the system.");
+//                        }
                     } else {
                         System.out.println(ANSI_RED + "Data integrity is not preserved.");
                     }
@@ -246,30 +263,30 @@ public class Admin {
     private static void uploadFile() {
         String filePath = getFilePath();
         if (filePath.equalsIgnoreCase("0")) {
-            System.out.println("File upload canceled.");
+            System.out.println(ANSI_RED + "File upload canceled.");
             askInput();
         }
         File f = new File(filePath);
         if (!f.exists()) {
-            System.err.println("Error in reading file: " + filePath);
-            System.err.println("Please try again.");
+            System.err.println(ANSI_RED + "Error in reading file: " + filePath);
+            System.err.println(ANSI_BLUE + "Please try again.");
             uploadFile();
         }
         System.out.println("Checking whether file is already exist or not.");
         if (FileUtil.fileExist(f.getName())) {
             System.err.println("The destination already has a file named \"" + f.getName() + "\"");
-            System.out.println("Do you want to replace it ? (Y/N)");
+            System.out.println(ANSI_BLUE + "Do you want to replace it ? (Y/N)");
             if (!fileExist(f)) {
-                System.out.println("File Uploding canceled.");
+                System.out.println(ANSI_RED + "File Uploding canceled.");
                 askInput();
             }
         }
         boolean fileUploaded = FileUtil.encryptAndUploadFile(f);
         if (fileUploaded) {
-            System.out.println("File uploaded successfully.");
+            System.out.println(ANSI_GREEN + "File uploaded successfully.");
             askInput();
         } else {
-            System.err.println("Error in Uploading File");
+            System.err.println(ANSI_RED + "Error in Uploading File");
             System.err.println("Please try again.");
             uploadFile();
         }

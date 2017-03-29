@@ -16,5 +16,7 @@ public class Constants {
     public static final String AWS_ACCESS_KEY = System.getProperty("AWS_ACCESS_KEY");
     public static final String AWS_SECRET_KEY = System.getProperty("AWS_SECRET_KEY");
     public static final String HASH_KEY = "HASH";
+    public static final String FILE_LENGTH_KEY = "FILE_LENGTH";
     public static final String LAST_MODIFIED_KEY = "LAST_MODIFIED";
+    public static final Integer LAST_MODIFIED_VARIANT = 10;
 }

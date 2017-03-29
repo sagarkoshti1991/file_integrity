@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang.math.NumberUtils;
+import org.joda.time.DateTime;
+import org.joda.time.Seconds;
 
 public class Admin {
 
@@ -143,26 +145,40 @@ public class Admin {
                 try {
                     String key = fileMap.get(choiseInt).toString();
                     File file = FileUtil.downloadAndDecryptFile(key);
+                    Long fileLength = file.length();
                     if (FileUtil.getHash(key.split("/")[1])
                             .equals(HashUtil.generateFileHash(file))) {
                         Map userMetadata = S3Connect.getUserMetadata(key);
 //                        System.out.println(userMetadata.get(Constants.LAST_MODIFIED_KEY));
 //                        System.out.println(S3Connect.getLastModified(key).getTime());
                         //check last access time
-//                        if (userMetadata.containsKey(Constants.LAST_MODIFIED_KEY)
-//                                && userMetadata.get(Constants.LAST_MODIFIED_KEY)
-//                                        .equals(S3Connect.getLastModified(key).getTime())) {
-                        //check hash from user data
-                        if (userMetadata.containsKey(Constants.HASH_KEY)
-                                && userMetadata.get(Constants.HASH_KEY)
-                                        .equals(FileUtil.getHash(key.split("/")[1]))) {
-                            System.out.println(ANSI_GREEN + "Data integrity is preserved.");
+                        if (userMetadata.containsKey(Constants.LAST_MODIFIED_KEY)) {
+                            Long millisFromMettaData = Long.valueOf(userMetadata
+                                    .get(Constants.LAST_MODIFIED_KEY).toString());
+                            Long millisFromS3 = S3Connect.getLastModified(key).getTime();
+                            Seconds difference = Seconds.secondsBetween(new DateTime(millisFromMettaData),
+                                    new DateTime(millisFromS3));
+                            if (difference.getSeconds() < Constants.LAST_MODIFIED_VARIANT) {
+                                //check file length
+                                if (userMetadata.containsKey(Constants.FILE_LENGTH_KEY)
+                                        && fileLength.toString().equals(userMetadata.get(Constants.FILE_LENGTH_KEY))) {
+                                    //check hash from user data
+                                    if (userMetadata.containsKey(Constants.HASH_KEY)
+                                            && userMetadata.get(Constants.HASH_KEY)
+                                                    .equals(FileUtil.getHash(key.split("/")[1]))) {
+                                        System.out.println(ANSI_GREEN + "Data integrity is preserved.");
+                                    } else {
+                                        System.out.println(ANSI_RED + "Data integrity is not preserved.");
+                                    }
+                                } else {
+                                    System.out.println(ANSI_RED + "File is length does not matched.");
+                                }
+                            } else {
+                                System.out.println(ANSI_RED + "File is modified outside the system.");
+                            }
                         } else {
-                            System.out.println(ANSI_RED + "Data integrity is not preserved.");
+                            System.out.println(ANSI_RED + "File is modified outside the system.");
                         }
-//                        } else {
-//                            System.out.println(ANSI_RED + "File is modified outside the system.");
-//                        }
                     } else {
                         System.out.println(ANSI_RED + "Data integrity is not preserved.");
                     }

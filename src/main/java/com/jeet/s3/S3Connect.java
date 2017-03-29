@@ -60,9 +60,10 @@ public class S3Connect {
         return amazonS3ClientWrapper.uploadFile(path, f);
     }
 
-    public static boolean uploadFile(String path, InputStream is, String hash) {
+    public static boolean uploadFile(String path, InputStream is, String hash,
+            Long fileLength) {
         AmazonS3ClientWrapper amazonS3ClientWrapper = new AmazonS3ClientWrapper(AMAZON_S3);
-        return amazonS3ClientWrapper.uploadFile(path, is, hash);
+        return amazonS3ClientWrapper.uploadFile(path, is, hash, fileLength);
     }
 
     public static Map getUserMetadata(String path) {

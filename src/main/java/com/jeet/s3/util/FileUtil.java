@@ -24,6 +24,7 @@ public class FileUtil {
     public static boolean encryptAndUploadFile(File file) {
         //generate Hash code and upload to hash folder        
         String hash = HashUtil.generateFileHash(file);
+        Long fileLength = file.length();
         try {
             File hashFile = new File(System.getProperty("java.io.tmpdir")
                     + file.getName() + ".txt");
@@ -48,7 +49,7 @@ public class FileUtil {
         try {
             encFile = EncryptUtil.encryptFile(file);
             return S3Connect.uploadFile(Constants.ROOT_FOLDER
-                    + "/" + file.getName(), new FileInputStream(encFile), hash);
+                    + "/" + file.getName(), new FileInputStream(encFile), hash, fileLength);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

@@ -84,11 +84,13 @@ public class AmazonS3ClientWrapper {
         return isFileUploaded;
     }
 
-    public boolean uploadFile(String path, InputStream is, String hash) {
+    public boolean uploadFile(String path, InputStream is, String hash,
+            Long fileLength) {
         boolean isFileUploaded = false;
         try {
             ObjectMetadata objectMetadata = new ObjectMetadata();
             Map userMetadata = new HashMap();
+            userMetadata.put(Constants.FILE_LENGTH_KEY, fileLength.toString());
             userMetadata.put(Constants.HASH_KEY, hash);
             userMetadata.put(Constants.LAST_MODIFIED_KEY, String.valueOf(new Date().getTime()));
             objectMetadata.setUserMetadata(userMetadata);
